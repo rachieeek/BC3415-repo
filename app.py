@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request,render_template
+import textblob
 
 app = Flask(__name__)
 
@@ -16,6 +17,15 @@ def prediction():
 def dbs():
     q = float(request.form.get("q"))
     return(render_template("dbs.html", r = ((-50.6*q)+90.2)))
+
+@app.route("/sentiment_analysis",methods=["GET","POST"])
+def sentiment_analysis():
+    q = request.form.get("q")
+
+    r = textblob.TextBlob(q).sentiment
+
+    return(render_template("sentiment_analysis.html", r = r))
+
 
 if __name__ == "__main__":
     app.run()
