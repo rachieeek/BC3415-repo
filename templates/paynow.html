@@ -6,21 +6,20 @@
 <body>
     <div class="container">
         <h2>Transfer Money</h2>
-
-        <input type = "text" id = "payer" placeholder = "Payer Address">
-        <input type = "text" id = "payee" placeholder = "Payee Address">
-        <input type = "number" id = "amount" placeholder = "Amount">
-
-        <button class = "btn" onclick = "transfer()">Submit</button>
-        <button class = "btn" onclick = "Transaction()">View Transaction</button>
+        <input type="text" id="payer" placeholder="Payer Address">
+        <input type="text" id="payee" placeholder="Payee Address">       
+        <input type="number" id="amount" placeholder="Amount">   
+        <button class="btn" onclick="transfer()">Transfer</button>
+        <button class="btn" onclick="transaction()">View Transaction</button>
+        <p id="view_payer"></p>
+        <p id="view_payee"></p>
+        <p id="view_amount"></p>
         <form action="/" method="post">
             <input type="submit" value="Main">
-        </form>
-
+        </form>    
         <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
         <script>
-            
-            const contractAddress = "0x59a1950f0A8f08f5877813c5aD43392497334D6E";
+            const contractAddress = "0x67c40ae49c9faf2fb6c4b58425d44ce710d74e4e"
             const contractABI = [
                 {
                     "inputs": [],
@@ -73,14 +72,27 @@
                     "stateMutability": "view",
                     "type": "function"
                 }
-            ];
+            ]
             const web3 = new Web3(Web3.givenProvider);
-            const contract = new web3.eth.Contract(contractABI, contractAddress);
+            const contract = new web3.eth.Contract(contractABI,contractAddress);
 
-            async function transfer(){
+            async function transfer() {
+                const accounts = await web3.eth.requestAccounts();
+                console.log("owner is ", accounts[0]);
+                const payer = document.getElementById("payer").value;
+                const payee = document.getElementById("payee").value;
+                const amount = document.getElementById("amount").value;
+                console.log(payer,payee,amount);
+
+                await contract.methods.weixin(payer,payee,amount).send({from:accounts[0]});
             }
-            async function transaction(){
+            async function transaction() {
+                const result = await contract.methods.transaction().call();
+
+                document.getElementById("view_payer").innerText = "Payer " + result[0];
+                document.getElementById("view_payee").innerText = "Payee " + result[1];
+                document.getElementById("view_amount").innerText = "Amount " + result[2];
             }
-</script>
+        </script>
     </div>
 </body>
